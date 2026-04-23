@@ -1,8 +1,9 @@
-package vista; // En minúsculas para que coincida con tu carpeta real
+package vista;
 
-import controlador.SessionController; // En minúsculas
-import controlador.RuletaController; // En minúsculas
-import modelo.Ruleta;               // En minúsculas
+import controlador.SessionController;
+import controlador.RuletaController;
+import modelo.Ruleta;
+import modelo.Usuario; // ESTA LÍNEA ES LA QUE FALTA
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,62 +16,49 @@ public class VentanaMenu extends JFrame {
     private JLabel lblBienvenida;
     private JLabel lblSaldo;
     private JButton btnJugar;
-    private JButton btnPerfil;
+    private JButton btnHistorial;
     private JButton btnCerrarSesion;
 
     public VentanaMenu(SessionController sessionController) {
         this.sessionController = sessionController;
-        // Se inicializa el controlador de la ruleta con un saldo inicial (Iteración 4)
         this.ruletaController = new RuletaController(new Ruleta(1000));
         inicializar();
     }
 
     private void inicializar() {
         setTitle("Menú Principal - Casino UFRO");
-        setSize(400, 300);
+        setSize(400, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(5, 1, 10, 10));
+        setLayout(new GridLayout(6, 1, 10, 10));
 
-        lblBienvenida = new JLabel("Bienvenido: " + sessionController.getNombreUsuario(), SwingConstants.CENTER);
-        lblSaldo = new JLabel("Saldo: $" + ruletaController.getSaldo(), SwingConstants.CENTER);
+        String nombreUsuario = sessionController.getUsuarioActual().getNombre();
+        lblBienvenida = new JLabel("Bienvenido: " + nombreUsuario, SwingConstants.CENTER);
+        lblSaldo = new JLabel("Saldo Disponible: $" + ruletaController.getSaldo(), SwingConstants.CENTER);
 
         btnJugar = new JButton("Ir a la Ruleta");
-        btnPerfil = new JButton("Ver Mi Perfil");
-        btnCerrarSesion = new JButton("Cerrar Sesión (Cerrar)");
+        btnHistorial = new JButton("Ver Mi Historial de Jugadas");
+        btnCerrarSesion = new JButton("Cerrar Sesión");
 
-        add(lblBienvenida);
-        add(lblSaldo);
-        add(btnJugar);
-        add(btnPerfil);
-        add(btnCerrarSesion);
+        add(lblBienvenida); add(lblSaldo); add(btnJugar);
+        add(btnHistorial); add(btnCerrarSesion);
 
         btnJugar.addActionListener(e -> abrirJuego());
-        btnPerfil.addActionListener(e -> mostrarPerfil());
+        btnHistorial.addActionListener(e -> abrirHistorial());
         btnCerrarSesion.addActionListener(e -> cerrarSesion());
     }
 
     private void abrirJuego() {
-        // Pasamos ambos controladores a la ventana de juego (Inyección de dependencias)
         new VentanaJuego(sessionController, ruletaController).setVisible(true);
-        dispose(); // Cerramos el menú para ahorrar memoria
+        dispose();
     }
 
-    private void mostrarPerfil() {
-        if (sessionController.getUsuarioActual() != null) {
-            JOptionPane.showMessageDialog(this,
-                    "Nombre: " + sessionController.getUsuarioActual().getNombre() +
-                            "\nUsuario: " + sessionController.getUsuarioActual().getUsername() +
-                            "\nSaldo: $" + ruletaController.getSaldo(),
-                    "Información del Perfil",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
+    private void abrirHistorial() {
+        new VentanaHistorial(sessionController).setVisible(true);
     }
 
     private void cerrarSesion() {
-        sessionController.cerrarSesion();
-        // Al cerrar sesión, volvemos a la ventana de Login
         new VentanaLogin(sessionController).setVisible(true);
-        dispose(); // Liberamos la memoria del menú
+        dispose();
     }
 }

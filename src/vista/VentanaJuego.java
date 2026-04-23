@@ -1,9 +1,10 @@
-package vista; // En minúsculas
+package vista;
 
-import controlador.RuletaController; // En minúsculas
-import controlador.SessionController; // En minúsculas
+import controlador.RuletaController;
+import controlador.SessionController;
 import modelo.Resultado;
-import modelo.TipoApuesta; // En minúsculas
+import modelo.TipoApuesta;
+import modelo.Usuario; // ESTA LÍNEA ES LA QUE FALTA
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,28 +27,28 @@ public class VentanaJuego extends JFrame {
     }
 
     private void inicializar() {
-        setTitle("Ruleta");
-        setSize(400, 250);
+        setTitle("Ruleta - Jugador: " + sessionController.getUsuarioActual().getNombre());
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(5, 2, 10, 10));
+        setLayout(new GridLayout(6, 2, 10, 10));
 
         add(new JLabel("Tipo de apuesta:"));
         cboTipo = new JComboBox<>(TipoApuesta.values());
         add(cboTipo);
 
-        add(new JLabel("Monto:"));
+        add(new JLabel("Monto a apostar:"));
         txtMonto = new JTextField();
         add(txtMonto);
 
-        lblSaldo = new JLabel("Saldo: $" + ruletaController.getSaldo());
+        add(new JLabel("Tu Saldo:"));
+        lblSaldo = new JLabel("$" + ruletaController.getSaldo());
         add(lblSaldo);
 
-        btnJugar = new JButton("Jugar");
+        btnJugar = new JButton("¡Girar!");
         btnVolver = new JButton("Volver");
 
-        add(btnJugar);
-        add(btnVolver);
+        add(btnJugar); add(btnVolver);
 
         btnJugar.addActionListener(e -> jugar());
         btnVolver.addActionListener(e -> volverMenu());
@@ -58,29 +59,19 @@ public class VentanaJuego extends JFrame {
             TipoApuesta tipo = (TipoApuesta) cboTipo.getSelectedItem();
             int monto = Integer.parseInt(txtMonto.getText());
 
-            Resultado resultado = ruletaController.jugar(tipo, monto);
+            // Aquí es donde te daba el error
+            Usuario usuarioQueJuega = sessionController.getUsuarioActual();
+            Resultado res = ruletaController.jugar(tipo, monto, usuarioQueJuega);
 
-            String mensaje = resultado.isAcierto() ? "Ganaste" : "Perdiste";
-
-            JOptionPane.showMessageDialog(this,
-                    mensaje + "\nNúmero salido: " + resultado.getNumero());
-
-            refrescarSaldo();
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Error: Ingrese un monto válido (números)");
+            JOptionPane.showMessageDialog(this, "Salió el: " + res.getNumero());
+            lblSaldo.setText("$" + ruletaController.getSaldo());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
-    private void refrescarSaldo() {
-        lblSaldo.setText("Saldo: $" + ruletaController.getSaldo());
-    }
-
     private void volverMenu() {
-        // Asegúrate de que VentanaMenu acepte el sessionController en su constructor
         new VentanaMenu(sessionController).setVisible(true);
-        dispose(); // Cerramos la ventana actual para liberar memoria (Iteración 4)
+        dispose();
     }
 }

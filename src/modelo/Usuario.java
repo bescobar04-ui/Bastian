@@ -1,36 +1,35 @@
 package modelo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Usuario {
     private String username;
-    private String password;
+    private String clave;
     private String nombre;
 
-    // Constructor para invitados
-    public Usuario() {
-        this.username = "invitado";
-        this.password = "";
-        this.nombre = "Invitado";
-    }
+    // Asociación 1 a muchos: Un usuario tiene muchos resultados [cite: 14, 84]
+    private final List<Resultado> historial = new ArrayList<>();
 
-    // Constructor para registro de nuevos usuarios
-    public Usuario(String username, String password, String nombre) {
+    public Usuario(String username, String clave, String nombre) {
         this.username = username;
-        this.password = password;
+        this.clave = clave;
         this.nombre = nombre;
     }
 
-    // --- AQUÍ VA EL MÉTODO QUE PREGUNTAS ---
-    public boolean validarCredenciales(String u, String p) {
-        // Compara el username y password guardados con los que vienen por parámetro
-        return this.username.equals(u) && this.password.equals(p);
+    // Método para registrar cada jugada en el historial del usuario [cite: 15, 85]
+    public void agregarResultado(Resultado r) {
+        this.historial.add(r);
     }
 
-    // Getters necesarios para que las ventanas muestren la info
-    public String getUsername() {
-        return username;
+    // Retorna el historial de forma protegida (unmodifiable) [cite: 91]
+    public List<Resultado> getHistorial() {
+        return Collections.unmodifiableList(historial);
     }
 
-    public String getNombre() {
-        return nombre;
-    }
+    // Getters necesarios para la Vista y el Controlador
+    public String getUsername() { return username; }
+    public String getClave() { return clave; }
+    public String getNombre() { return nombre; }
 }
