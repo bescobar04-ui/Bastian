@@ -38,5 +38,14 @@ public class Estadistica {
 		this.porcentajeVictorias = ((double) this.victorias / this.totalJugadas) * 100;
 	}
 
+	/**
+	 * 
+	 * @param historial
+	 */
+	public void calcularEstadisticas(int historial) {
+		// TODO - implement Estadistica.calcularEstadisticas
+		throw new UnsupportedOperationException();
+	}
+
 	// Puedes borrar   el método operation() si no lo vas a usar
 }

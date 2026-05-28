@@ -1,16 +1,13 @@
-package modelo; // Minúscula para la carpeta
+package modelo;
 
 public class Resultado {
-
     private int numero;
-    private TipoApuesta tipoApuesta;
-    private int monto;
+    private ApuestaBase apuesta; // Cambio clave: de TipoApuesta a ApuestaBase
     private boolean acierto;
 
-    public Resultado(int numero, TipoApuesta tipoApuesta, int monto, boolean acierto) {
+    public Resultado(int numero, ApuestaBase apuesta, boolean acierto) {
         this.numero = numero;
-        this.tipoApuesta = tipoApuesta;
-        this.monto = monto;
+        this.apuesta = apuesta;
         this.acierto = acierto;
     }
 
@@ -18,15 +15,16 @@ public class Resultado {
         return numero;
     }
 
-    public TipoApuesta getTipoApuesta() {
-        return tipoApuesta;
-    }
-
-    public int getMonto() {
-        return monto;
+    public ApuestaBase getApuesta() {
+        return apuesta;
     }
 
     public boolean isAcierto() {
         return acierto;
+    }
+
+    // Método de conveniencia para obtener el monto de la apuesta
+    public int getMonto() {
+        return apuesta.getMontoApostado();
     }
 }

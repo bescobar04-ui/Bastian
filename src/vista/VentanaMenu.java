@@ -3,7 +3,7 @@ package vista;
 import controlador.SessionController;
 import controlador.RuletaController;
 import modelo.Ruleta;
-import modelo.Usuario; // ESTA L√çNEA ES LA QUE FALTA
+import modelo.Usuario; // ESTA L√?NEA ES LA QUE FALTA
 
 import javax.swing.*;
 import java.awt.*;

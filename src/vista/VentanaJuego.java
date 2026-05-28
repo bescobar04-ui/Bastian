@@ -4,7 +4,7 @@ import controlador.RuletaController;
 import controlador.SessionController;
 import modelo.Resultado;
 import modelo.TipoApuesta;
-import modelo.Usuario; // ESTA L√çNEA ES LA QUE FALTA
+import modelo.Usuario; // ESTA L√?NEA ES LA QUE FALTA
 
 import javax.swing.*;
 import java.awt.*;

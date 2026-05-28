@@ -1,4 +1,4 @@
-package controlador; // Fíjate que el paquete sea controlador
+package controlador;
 
 import modelo.*;
 
@@ -9,13 +9,26 @@ public class RuletaController {
         this.ruleta = ruleta;
     }
 
-    public Resultado jugar(TipoApuesta tipoApuesta, int monto, Usuario usuarioActual) {
+    // Ahora recibe cualquier hija de ApuestaBase (Par, Rojo, etc.)
+    public Resultado jugar(ApuestaBase apuestaRealizada, Usuario usuarioActual) {
         int numero = ruleta.generarNumero();
-        boolean acierto = ruleta.evaluarResultado(numero, tipoApuesta);
-        Resultado nuevoResultado = new Resultado(numero, tipoApuesta, monto, acierto);
-        usuarioActual.agregarResultado(nuevoResultado); // Asociación 1 a muchos
+
+        // POLIMORFISMO: La apuesta sabe cómo evaluarse sola
+        boolean acierto = apuestaRealizada.evaluarAcierto(numero);
+
+        Resultado nuevoResultado = new Resultado(numero, apuestaRealizada, acierto);
+
+        usuarioActual.agregarResultado(nuevoResultado);
+
+        // Lógica de saldo: si gana, se le paga el doble del monto apostado
+        if (acierto) {
+            usuarioActual.sumarSaldo(apuestaRealizada.getMontoApostado() * 2);
+        }
+
         return nuevoResultado;
     }
 
-    public int getSaldo() { return ruleta.getSaldo(); }
+    public int getSaldo(Usuario usuario) {
+        return usuario.getSaldo();
+    }
 }
