@@ -1,112 +1,43 @@
-package modelo; // Corregido a minúsculas para coincidir con tu carpeta
+package modelo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Ruleta {
-
-    public static final int MAX_HISTORIAL = 100;
-    public static final int MAX_NUMERO = 36;
-
-    private final int[] historialNumeros = new int[MAX_HISTORIAL];
-    private final int[] historialApuestas = new int[MAX_HISTORIAL];
-    private final boolean[] historialAciertos = new boolean[MAX_HISTORIAL];
-    private int historialSize = 0;
-
-    private final Random rng = new Random();
-    private final int[] numerosRojos = {
-            1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
-    };
-
     private int saldo;
+    private final List<Resultado> historialRondas = new ArrayList<>();
+    private final Random rng = new Random();
 
-    public Ruleta() {
-        this.saldo = 0;
-    }
+    // Iteración 8: Dependemos de la abstracción
+    private final IRepositorioResultados repositorio;
 
-    public Ruleta(int saldoInicial) {
+    public Ruleta(int saldoInicial, IRepositorioResultados repositorio) {
         this.saldo = saldoInicial;
+        this.repositorio = repositorio;
     }
 
     public int generarNumero() {
-        return rng.nextInt(MAX_NUMERO + 1);
+        return rng.nextInt(37); // Genera de 0 a 36
     }
 
-    public boolean evaluarResultado(int numero, TipoApuesta tipo) {
-        if (numero == 0) {
-            return false;
-        }
-
-        return switch (tipo) {
-            case ROJO -> esRojo(numero);
-            case NEGRO -> !esRojo(numero);
-            case PAR -> numero % 2 == 0;
-            case IMPAR -> numero % 2 != 0;
-        };
-    }
-
-    public boolean esRojo(int n) {
-        for (int rojo : numerosRojos) {
-            if (rojo == n) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void registrarResultado(int numero, int apuesta, boolean acierto) {
-        if (historialSize >= MAX_HISTORIAL) {
-            return;
-        }
-
-        historialNumeros[historialSize] = numero;
-        historialApuestas[historialSize] = apuesta;
-        historialAciertos[historialSize] = acierto;
-        historialSize++;
+    public void registrarRonda(int numero, modelo.Apuestas.ApuestaBase apuesta, int monto) {
+        boolean acierto = (numero != 0) && apuesta.evaluar(numero);
 
         if (acierto) {
-            saldo += apuesta;
+            saldo += monto; // Simplificado: gana el monto apostado
         } else {
-            saldo -= apuesta;
-        }
-    }
-
-    public int getSaldo() {
-        return saldo;
-    }
-
-    public void depositar(int monto) {
-        if (monto <= 0) {
-            throw new IllegalArgumentException("El monto debe ser mayor que 0");
-        }
-        saldo += monto;
-    }
-
-    public String obtenerEstadisticas() {
-        if (historialSize == 0) {
-            return "No hay rondas jugadas.";
+            saldo -= monto;
         }
 
-        int totalApostado = 0;
-        int totalAciertos = 0;
-        int gananciaNeta = 0;
+        Resultado r = new Resultado(numero, apuesta, acierto, monto);
+        historialRondas.add(r);
 
-        for (int i = 0; i < historialSize; i++) {
-            totalApostado += historialApuestas[i];
-            if (historialAciertos[i]) {
-                totalAciertos++;
-                gananciaNeta += historialApuestas[i];
-            } else {
-                gananciaNeta -= historialApuestas[i];
-            }
-        }
-
-        double porcentaje = (double) totalAciertos * 100 / historialSize;
-
-        return "Rondas: " + historialSize
-                + "\nTotal apostado: $" + totalApostado
-                + "\nAciertos: " + totalAciertos
-                + "\n% acierto: " + String.format("%.1f", porcentaje) + "%"
-                + "\nGanancia neta: $" + gananciaNeta
-                + "\nSaldo actual: $" + saldo;
+        // Iteración 8: Formateamos como texto y guardamos de forma externa
+        String lineaHistorial = "Numero: " + numero + " | Apuesta: " + apuesta.getEtiqueta() + " | Monto: $" + monto + " | Acierto: " + (acierto ? "SI" : "NO");
+        repositorio.guardarResultado(lineaHistorial);
     }
+
+    public int getSaldo() { return saldo; }
+    public List<Resultado> getHistorialRondas() { return historialRondas; }
 }

@@ -1,82 +1,50 @@
 package vista;
 
 import controlador.SessionController;
+import controlador.RuletaController;
+import controlador.ResultadoController;
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaLogin extends JFrame {
-
     private final SessionController sessionController;
-    private JTextField txtUsuario;
-    private JPasswordField txtClave;
-    private JButton btnIngresar;
-    private JButton btnIrRegistro;
+    private final RuletaController ruletaController;
+    private final ResultadoController resultadoController;
 
-    public VentanaLogin(SessionController sessionController) {
+    private final JTextField txtUsuario = new JTextField(15);
+    private final JPasswordField txtClave = new JPasswordField(15);
+    private final JButton btnIngresar = new JButton("Ingresar");
+
+    public VentanaLogin(SessionController sessionController, RuletaController ruletaController, ResultadoController resultadoController) {
         this.sessionController = sessionController;
-        inicializar();
-    }
+        this.ruletaController = ruletaController;
+        this.resultadoController = resultadoController;
 
-    private void inicializar() {
-        setTitle("Acceso - Casino UFRO");
-        setSize(350, 220);
+        setTitle("Autenticación - Ruleta");
+        setSize(320, 180);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(new GridLayout(3, 2, 8, 8));
 
-        // Mejora 1: Padding y diseño más limpio
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        add(new JLabel("  Usuario:")); add(txtUsuario);
+        add(new JLabel("  Contraseña:")); add(txtClave);
+        add(new JLabel("")); add(btnIngresar);
 
-        panel.add(new JLabel("Usuario:"));
-        txtUsuario = new JTextField();
-        panel.add(txtUsuario);
+        btnIngresar.addActionListener(e -> {
+            String user = txtUsuario.getText();
+            String pass = new String(txtClave.getPassword());
 
-        panel.add(new JLabel("Clave:"));
-        txtClave = new JPasswordField();
-        panel.add(txtClave);
+            if (sessionController.iniciarSesion(user, pass)) {
+                JOptionPane.showMessageDialog(this, "¡Bienvenido al casino, " + sessionController.getUsuarioActual().getNombre() + "!");
 
-        btnIngresar = new JButton("Ingresar");
-        btnIrRegistro = new JButton("Registrarse");
+                // 🎰 CONECTADO: Abre la ventana del juego pasándole los controladores limpios
+                VentanaMenu menuPrincipal = new VentanaMenu(ruletaController, resultadoController);
+                menuPrincipal.setVisible(true);
 
-        panel.add(btnIngresar);
-        panel.add(btnIrRegistro);
-
-        add(panel);
-
-        btnIngresar.addActionListener(e -> intentarLogin());
-        btnIrRegistro.addActionListener(e -> abrirRegistro());
-
-        // Mejora 2: Permitir presionar "Enter" para entrar
-        getRootPane().setDefaultButton(btnIngresar);
-    }
-
-    private void intentarLogin() {
-        String usuario = txtUsuario.getText();
-        String clave = new String(txtClave.getPassword());
-
-        // Mejora 3: Validación de campos vacíos antes de llamar al controlador
-        if (usuario.isEmpty() || clave.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos", "Atención", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        boolean ok = sessionController.iniciarSesion(usuario, clave);
-
-        if (ok) {
-            // El SessionController ahora "mantiene" al usuario actual para toda la sesión
-            JOptionPane.showMessageDialog(this, "Bienvenido " + sessionController.getUsuarioActual().getNombre());
-
-            // Pasamos la ÚNICA instancia de sessionController
-            new VentanaMenu(sessionController).setVisible(true);
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Credenciales incorrectas", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void abrirRegistro() {
-        // Redirigir a la ventana que ya tienes creada
-        new VentanaRegistro(sessionController).setVisible(true);
-        dispose();
+                this.dispose(); // Cierra el login de forma limpia
+            } else {
+                JOptionPane.showMessageDialog(this, "Credenciales incorrectas", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 }

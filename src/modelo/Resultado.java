@@ -1,30 +1,22 @@
 package modelo;
 
-public class Resultado {
-    private int numero;
-    private ApuestaBase apuesta; // Cambio clave: de TipoApuesta a ApuestaBase
-    private boolean acierto;
+import modelo.Apuestas.ApuestaBase;
 
-    public Resultado(int numero, ApuestaBase apuesta, boolean acierto) {
-        this.numero = numero;
+public class Resultado {
+    private final int numeroGanador;
+    private final ApuestaBase apuesta;
+    private final boolean acierto;
+    private final int montoApuesta;
+
+    public Resultado(int numeroGanador, ApuestaBase apuesta, boolean acierto, int montoApuesta) {
+        this.numeroGanador = numeroGanador;
         this.apuesta = apuesta;
         this.acierto = acierto;
+        this.montoApuesta = montoApuesta;
     }
 
-    public int getNumero() {
-        return numero;
-    }
-
-    public ApuestaBase getApuesta() {
-        return apuesta;
-    }
-
-    public boolean isAcierto() {
-        return acierto;
-    }
-
-    // Método de conveniencia para obtener el monto de la apuesta
-    public int getMonto() {
-        return apuesta.getMontoApostado();
-    }
+    public int getNumeroGanador() { return numeroGanador; }
+    public ApuestaBase getApuesta() { return apuesta; }
+    public boolean getAcierto() { return acierto; }
+    public int getMontoApuesta() { return montoApuesta; }
 }

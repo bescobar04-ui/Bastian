@@ -1,6 +1,8 @@
 package controlador;
 
-import modelo.*;
+import modelo.Ruleta;
+import modelo.Apuestas.*;
+import java.util.List;
 
 public class RuletaController {
     private final Ruleta ruleta;
@@ -9,26 +11,21 @@ public class RuletaController {
         this.ruleta = ruleta;
     }
 
-    // Ahora recibe cualquier hija de ApuestaBase (Par, Rojo, etc.)
-    public Resultado jugar(ApuestaBase apuestaRealizada, Usuario usuarioActual) {
-        int numero = ruleta.generarNumero();
-
-        // POLIMORFISMO: La apuesta sabe cómo evaluarse sola
-        boolean acierto = apuestaRealizada.evaluarAcierto(numero);
-
-        Resultado nuevoResultado = new Resultado(numero, apuestaRealizada, acierto);
-
-        usuarioActual.agregarResultado(nuevoResultado);
-
-        // Lógica de saldo: si gana, se le paga el doble del monto apostado
-        if (acierto) {
-            usuarioActual.sumarSaldo(apuestaRealizada.getMontoApostado() * 2);
-        }
-
-        return nuevoResultado;
+    public int getSaldo() {
+        return ruleta.getSaldo();
     }
 
-    public int getSaldo(Usuario usuario) {
-        return usuario.getSaldo();
+    public void jugar(String tipoApuesta, int monto) {
+        ApuestaBase apuesta;
+        switch (tipoApuesta.toUpperCase()) {
+            case "ROJO": apuesta = new ApuestaRojo(); break;
+            case "NEGRO": apuesta = new ApuestaNegro(); break;
+            case "PAR": apuesta = new ApuestaPar(); break;
+            case "IMPAR": apuesta = new ApuestaImpar(); break;
+            default: throw new IllegalArgumentException("Tipo de apuesta inválido");
+        }
+
+        int numeroGanador = ruleta.generarNumero();
+        ruleta.registrarRonda(numeroGanador, apuesta, monto);
     }
 }

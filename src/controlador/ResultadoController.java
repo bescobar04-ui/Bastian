@@ -1,7 +1,17 @@
 package controlador;
 
-import modelo.Resultado; // ESTA L√?NEA ES LA QUE FALTA
+import modelo.Ruleta;
+import modelo.Resultado;
+import java.util.List;
 
 public class ResultadoController {
-    // ... tu c√≥digo ...
+    private final Ruleta ruleta;
+
+    public ResultadoController(Ruleta ruleta) {
+        this.ruleta = ruleta;
+    }
+
+    public List<Resultado> getHistorial() {
+        return ruleta.getHistorialRondas();
+    }
 }

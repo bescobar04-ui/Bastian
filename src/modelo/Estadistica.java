@@ -3,49 +3,21 @@ package modelo;
 import java.util.List;
 
 public class Estadistica {
+    private final int totalJugadas;
+    private int victorias = 0;
+    private double porcentajeVictorias = 0.0;
 
-	private int totalJugadas;
-	private int victorias;
-	private double porcentajeVictorias;
-	private int rachaMaxima;
-	private TipoApuesta tipoMasJugado;
+    public Estadistica(List<Resultado> historial) {
+        this.totalJugadas = historial.size();
+        if (totalJugadas > 0) {
+            for (Resultado r : historial) {
+                if (r.getAcierto()) victorias++;
+            }
+            this.porcentajeVictorias = (this.victorias * 100.0) / this.totalJugadas;
+        }
+    }
 
-	public void calcularEstadisticas(List<Resultado> historial) {
-		if (historial == null || historial.isEmpty()) {
-			this.totalJugadas = 0;
-			this.victorias = 0;
-			this.porcentajeVictorias = 0;
-			this.rachaMaxima = 0;
-			return;
-		}
-
-		this.totalJugadas = historial.size();
-		this.victorias = 0;
-		int rachaActual = 0;
-		this.rachaMaxima = 0;
-
-		for (Resultado r : historial) {
-			if (r.isAcierto()) {
-				this.victorias++;
-				rachaActual++;
-				if (rachaActual > this.rachaMaxima) {
-					this.rachaMaxima = rachaActual;
-				}
-			} else {
-				rachaActual = 0;
-			}
-		}
-		this.porcentajeVictorias = ((double) this.victorias / this.totalJugadas) * 100;
-	}
-
-	/**
-	 * 
-	 * @param historial
-	 */
-	public void calcularEstadisticas(int historial) {
-		// TODO - implement Estadistica.calcularEstadisticas
-		throw new UnsupportedOperationException();
-	}
-
-	// Puedes borrar   el método operation() si no lo vas a usar
+    public int getTotalJugadas() { return totalJugadas; }
+    public int getVictorias() { return victorias; }
+    public double getPorcentajeVictorias() { return porcentajeVictorias; }
 }
