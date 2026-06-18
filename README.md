@@ -1,5 +1,6 @@
-# Iteración 09: Pruebas Unitarias Automatizadas (UT)
-# Bastián Escobar POO RULETA 9 
+# Iteración 09: Pruebas Unitarias Automatizadas (UT) 
+# Bastián Escobar POO RULETA 9
+
 Este módulo contiene el diseño y la ejecución de la suite de pruebas unitarias automatizadas para el sistema de la Ruleta utilizando **JUnit 5** y **Maven**, asegurando la validación de las reglas de negocio críticas en el backend antes de su paso a producción.
 
 ---
@@ -27,8 +28,8 @@ Se han automatizado rigurosamente los 7 casos de prueba prioritarios exigidos en
 
 ---
 
-## 🚀 Resultado de la Ejecución
+## 📸 Evidencia de Ejecución Exitosa
 
-> **Estado actual:** `9 tests total, 110 ms — 100% PASSED` ✅
->
-> Toda la suite de pruebas del dominio y controladores se ejecuta exitosamente a nivel local y se encuentra versionada de manera limpia en esta rama.
+A continuación se adjunta la captura de pantalla de IntelliJ IDEA que demuestra la correcta ejecución y aprobación de la suite completa de pruebas unitarias:
+
+![Resultado de Pruebas Unitarias](./PRUEBAS.png)
