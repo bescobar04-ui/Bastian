@@ -24,6 +24,12 @@ public class RepositorioArchivo implements IRepositorioResultados {
 
     @Override
     public void guardar(Resultado resultado) {
+        // Caso 4: Control preventivo de escritura con estructuras IF
+        if (Files.exists(rutaArchivo) && !Files.isWritable(rutaArchivo)) {
+            System.out.println("Error de control: El archivo no cuenta con permisos de escritura.");
+            return;
+        }
+
         try {
             boolean archivoNuevo = !Files.exists(rutaArchivo) || Files.size(rutaArchivo) == 0;
 
@@ -45,6 +51,7 @@ public class RepositorioArchivo implements IRepositorioResultados {
                 writer.newLine();
             }
         } catch (IOException e) {
+            // Caso 4: Excepción legítima capturada ante fallos del sistema de archivos externo
             System.out.println("No se pudo guardar el resultado en archivo: " + e.getMessage());
         }
     }
@@ -53,11 +60,13 @@ public class RepositorioArchivo implements IRepositorioResultados {
     public List<Resultado> obtenerTodos() {
         List<Resultado> resultados = new ArrayList<>();
 
-        if (!Files.exists(rutaArchivo)) {
+        // Caso 4: Verificación con IF de ruta, existencia y lectura del flujo normal
+        if (!Files.exists(rutaArchivo) || !Files.isRegularFile(rutaArchivo) || !Files.isReadable(rutaArchivo)) {
             return resultados;
         }
 
         try {
+            // Operación de lectura del sistema de archivos (puede lanzar IOException)
             List<String> lineas = Files.readAllLines(rutaArchivo);
 
             for (int i = 1; i < lineas.size(); i++) {
@@ -69,19 +78,33 @@ public class RepositorioArchivo implements IRepositorioResultados {
 
                 String[] partes = linea.split(",");
 
+                // Caso 7: Check ligero de cantidad de campos requeridos
                 if (partes.length != 5) {
                     continue;
                 }
 
-                int numero = Integer.parseInt(partes[0]);
-                String color = partes[1];
-                String tipoApuesta = partes[2];
-                int monto = Integer.parseInt(partes[3]);
-                boolean acierto = Boolean.parseBoolean(partes[4]);
+                // Caso 7: Bloque try-catch local para capturar NumberFormatException por separado
+                try {
+                    int numero = Integer.parseInt(partes[0].trim());
+                    String color = partes[1].trim();
+                    String tipoApuesta = partes[2].trim();
+                    int monto = Integer.parseInt(partes[3].trim());
+                    boolean acierto = Boolean.parseBoolean(partes[4].trim());
 
-                resultados.add(new Resultado(numero, tipoApuesta, monto, acierto, color));
+                    // Caso 7: Control con IF para verificar rangos plausibles
+                    if (numero < 0 || numero > 36 || monto < 0) {
+                        continue; // Descarte por inconsistencia de datos
+                    }
+
+                    resultados.add(new Resultado(numero, tipoApuesta, monto, acierto, color));
+
+                } catch (NumberFormatException e) {
+                    // Caso 7: Captura local para descartar solo la línea corrupta y continuar con el ciclo
+                    System.out.println("Omitiendo línea corrupta en el historial: " + e.getMessage());
+                }
             }
-        } catch (IOException | NumberFormatException e) {
+        } catch (IOException e) {
+            // Caso 4: Captura de error crítico del sistema de archivos
             System.out.println("No se pudo leer el historial desde archivo: " + e.getMessage());
         }
 

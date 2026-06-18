@@ -1,48 +1,24 @@
 package Modelo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Usuario {
 
     private String username;
     private String password;
     private String nombre;
-    private List<Resultado> historial;
-
-    public Usuario() {
-        this.username = "invitado";
-        this.password = "";
-        this.nombre = "Invitado";
-        this.historial = new ArrayList<>();
-    }
 
     public Usuario(String username, String password, String nombre) {
-        if (username == null || username.isBlank() ||
-                password == null || password.isBlank() ||
-                nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("Datos requeridos");
-        }
-
+        // Caso 5: Al estar completamente filtrado por las capas superiores,
+        // aquí no quedan escenarios excepcionales, por lo que la asignación es directa.
         this.username = username;
         this.password = password;
         this.nombre = nombre;
-        this.historial = new ArrayList<>();
     }
 
-    public boolean validarCredenciales(String u, String p) {
-        if (u == null || p == null) {
+    public boolean validarCredenciales(String username, String password) {
+        if (username == null || password == null) {
             return false;
         }
-        return this.username.equals(u) && this.password.equals(p);
-    }
-
-    public void agregarResultado(Resultado resultado) {
-        historial.add(resultado);
-    }
-
-    public List<Resultado> getHistorial() {
-        return historial;
+        return this.username.equals(username) && this.password.equals(password);
     }
 
     public String getUsername() {
@@ -51,12 +27,5 @@ public class Usuario {
 
     public String getNombre() {
         return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
-        this.nombre = nombre;
     }
 }

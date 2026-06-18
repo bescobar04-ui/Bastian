@@ -4,7 +4,6 @@ import Controlador.SessionController;
 import Controlador.RuletaController;
 import Modelo.Persistencia.IRepositorioResultados;
 import Modelo.Persistencia.RepositorioArchivo;
-import Modelo.Persistencia.RepositorioEnMemoria;
 import Modelo.Ruleta;
 
 import javax.swing.*;
@@ -53,22 +52,30 @@ public class VentanaLogin extends JFrame {
         String usuario = txtUsuario.getText();
         String clave = new String(txtClave.getPassword());
 
-        boolean ok = sessionController.iniciarSesion(usuario, clave);
+        // Caso 5: Estructura condicional IF para validar campos vacíos antes de llamar al controlador
+        if (usuario.isBlank() || clave.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Error: Todos los campos son obligatorios.");
+            return; // Rompe el flujo sin invocar al backend
+        }
 
-        if (ok) {
-            JOptionPane.showMessageDialog(this, "Bienvenido " + sessionController.getNombreUsuario());
+        try {
+            // Caso 1: Invoca el controlador para el flujo normal
+            boolean ok = sessionController.iniciarSesion(usuario, clave);
 
-            // Repositorio persistente en archivo. Para probar memoria, cambia la línea por:
-            // IRepositorioResultados repositorio = new RepositorioEnMemoria();
-            IRepositorioResultados repositorio = new RepositorioArchivo("historial_ruleta.csv");
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Bienvenido " + sessionController.getNombreUsuario());
 
-            Ruleta ruleta = new Ruleta(1000, repositorio);
-            RuletaController ruletaController = new RuletaController(ruleta, sessionController);
+                IRepositorioResultados repositorio = new RepositorioArchivo("historial_ruleta.csv");
 
-            new VentanaMenu(sessionController, ruletaController).setVisible(true);
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Credenciales incorrectas");
+                Ruleta ruleta = new Ruleta(1000, repositorio);
+                RuletaController ruletaController = new RuletaController(ruleta, sessionController);
+
+                new VentanaMenu(sessionController, ruletaController).setVisible(true);
+                dispose();
+            }
+        } catch (IllegalStateException e) {
+            // Caso 1: Captura de excepción de negocio (Credenciales incorrectas)
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
 

@@ -22,6 +22,15 @@ public class VentanaMenu extends JFrame {
     public VentanaMenu(SessionController sessionController, RuletaController ruletaController) {
         this.sessionController = sessionController;
         this.ruletaController = ruletaController;
+
+        // CASO 3: Validación estricta de sesión antes de inicializar componentes visuales
+        if (!sessionController.hayUsuario()) {
+            JOptionPane.showMessageDialog(null, "Acceso denegado. Debe iniciar sesión primero.", "Seguridad", JOptionPane.ERROR_MESSAGE);
+            // Redirección inmediata y segura al Login sin construir la ventana rota
+            SwingUtilities.invokeLater(() -> new VentanaLogin(sessionController).setVisible(true));
+            this.dispose();
+            return;
+        }
         inicializar();
     }
 
@@ -49,11 +58,46 @@ public class VentanaMenu extends JFrame {
         add(btnEstadisticas);
         add(btnCerrarSesion);
 
-        btnJugar.addActionListener(e -> abrirJuego());
-        btnPerfil.addActionListener(e -> mostrarPerfil());
-        btnHistorial.addActionListener(e -> abrirHistorial());
-        btnEstadisticas.addActionListener(e -> abrirEstadisticas());
-        btnCerrarSesion.addActionListener(e -> cerrarSesion());
+        // CASO 6: Aplicación de red de seguridad/resiliencia en listeners de la UI
+        btnJugar.addActionListener(e -> {
+            try {
+                abrirJuego();
+            } catch (Exception ex) {
+                System.err.println("Fallo evitado al abrir el juego: " + ex.getMessage());
+            }
+        });
+
+        btnPerfil.addActionListener(e -> {
+            try {
+                mostrarPerfil();
+            } catch (Exception ex) {
+                System.err.println("Fallo evitado al mostrar el perfil: " + ex.getMessage());
+            }
+        });
+
+        btnHistorial.addActionListener(e -> {
+            try {
+                abrirHistorial();
+            } catch (Exception ex) {
+                System.err.println("Fallo evitado al abrir el historial: " + ex.getMessage());
+            }
+        });
+
+        btnEstadisticas.addActionListener(e -> {
+            try {
+                abrirEstadisticas();
+            } catch (Exception ex) {
+                System.err.println("Fallo evitado al abrir estadísticas: " + ex.getMessage());
+            }
+        });
+
+        btnCerrarSesion.addActionListener(e -> {
+            try {
+                cerrarSesion();
+            } catch (Exception ex) {
+                System.err.println("Fallo evitado al cerrar sesión: " + ex.getMessage());
+            }
+        });
     }
 
     private void abrirJuego() {
@@ -62,10 +106,16 @@ public class VentanaMenu extends JFrame {
     }
 
     private void mostrarPerfil() {
-        JOptionPane.showMessageDialog(this,
-                "Nombre: " + sessionController.getUsuarioActual().getNombre() +
-                        "\nUsuario: " + sessionController.getUsuarioActual().getUsername() +
-                        "\nSaldo: $" + ruletaController.getSaldo());
+        // CASO 3: Intercepción controlada de IllegalStateException si se invoca el método protegido sin sesión válida
+        try {
+            JOptionPane.showMessageDialog(this,
+                    "Nombre: " + sessionController.getUsuarioActual().getNombre() +
+                            "\nUsuario: " + sessionController.getUsuarioActual().getUsername() +
+                            "\nSaldo: $" + ruletaController.getSaldo());
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error de Estado", JOptionPane.ERROR_MESSAGE);
+            cerrarSesion(); // Forzar salida limpia ante inconsistencia de datos
+        }
     }
 
     private void abrirHistorial() {

@@ -50,18 +50,26 @@ public class VentanaRegistro extends JFrame {
     }
 
     private void registrar() {
+        String usuario = txtUsuario.getText();
+        String clave = new String(txtClave.getPassword());
+        String nombre = txtNombre.getText();
+
+        // Caso 5: Estructura condicional IF para validar campos vacíos antes de llamar al controlador
+        if (usuario.isBlank() || clave.isBlank() || nombre.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Error: Todos los campos son obligatorios.");
+            return; // Rompe el flujo sin invocar al backend
+        }
+
         try {
-            sessionController.registrarUsuario(
-                    txtUsuario.getText(),
-                    new String(txtClave.getPassword()),
-                    txtNombre.getText()
-            );
+            // Caso 1: Invoca el controlador para el flujo normal de registro
+            sessionController.registrarUsuario(usuario, clave, nombre);
 
             JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
             new VentanaLogin(sessionController).setVisible(true);
             dispose();
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
+            // Caso 1: Captura de la excepción de negocio (Usuario ya registrado)
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
