@@ -1,0 +1,6 @@
+numero,color,tipoApuesta,monto,acierto
+18,ROJO,ROJO,123,true
+2,NEGRO,ROJO,123,false
+35,NEGRO,ROJO,234,false
+3,ROJO,ROJO,234,true
+36,ROJO,ROJO,234,true
